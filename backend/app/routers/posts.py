@@ -1,3 +1,5 @@
+"""CRUD endpoints for posts (news articles and calendar events)."""
+
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
 
@@ -22,6 +24,7 @@ def list_posts(
     limit: int = Query(10, ge=1, le=50),
     service: PostService = Depends(get_post_service),
 ):
+    """List published posts with optional category filter and pagination."""
     return service.list_published(category, page, limit)
 
 
@@ -33,11 +36,13 @@ def list_all_posts(
     service: PostService = Depends(get_post_service),
     user: User = Depends(get_current_user),
 ):
+    """List all posts including unpublished (admin only)."""
     return service.list_all(category, page, limit)
 
 
 @router.get("/{slug}", response_model=PostOut)
 def get_post(slug: str, service: PostService = Depends(get_post_service)):
+    """Get a single post by its URL slug."""
     return service.get_by_slug(slug)
 
 
@@ -47,6 +52,7 @@ def create_post(
     service: PostService = Depends(get_post_service),
     user: User = Depends(get_current_user),
 ):
+    """Create a new post (admin only). Slug is auto-generated from the title."""
     return service.create(data)
 
 
@@ -57,6 +63,7 @@ def update_post(
     service: PostService = Depends(get_post_service),
     user: User = Depends(get_current_user),
 ):
+    """Update an existing post (admin only)."""
     return service.update(post_id, data)
 
 
@@ -66,4 +73,5 @@ def delete_post(
     service: PostService = Depends(get_post_service),
     user: User = Depends(get_current_user),
 ):
+    """Delete a post and its attachments (admin only)."""
     service.delete(post_id)

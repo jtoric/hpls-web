@@ -1,3 +1,5 @@
+"""CRUD endpoints for static pages."""
+
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
@@ -17,11 +19,13 @@ def get_page_service(db: Session = Depends(get_db)) -> PageService:
 
 @router.get("", response_model=list[PageListOut])
 def list_pages(service: PageService = Depends(get_page_service)):
+    """List all static pages grouped by section."""
     return service.list_all()
 
 
 @router.get("/{slug}", response_model=PageOut)
 def get_page(slug: str, service: PageService = Depends(get_page_service)):
+    """Get a single page by its URL slug."""
     return service.get_by_slug(slug)
 
 
@@ -31,6 +35,7 @@ def create_page(
     service: PageService = Depends(get_page_service),
     user: User = Depends(get_current_user),
 ):
+    """Create a new static page (admin only)."""
     return service.create(data)
 
 
@@ -41,4 +46,5 @@ def update_page(
     service: PageService = Depends(get_page_service),
     user: User = Depends(get_current_user),
 ):
+    """Update page title or content (admin only)."""
     return service.update(page_id, data)

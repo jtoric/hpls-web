@@ -1,3 +1,5 @@
+"""Authentication endpoints: login and current-user info."""
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
@@ -17,9 +19,11 @@ def get_auth_service(db: Session = Depends(get_db)) -> AuthService:
 
 @router.post("/login", response_model=Token)
 def login(data: LoginRequest, service: AuthService = Depends(get_auth_service)):
+    """Authenticate with username/password and receive a JWT."""
     return service.login(data.username, data.password)
 
 
 @router.get("/me", response_model=UserOut)
 def me(user: User = Depends(get_current_user)):
+    """Return the currently authenticated user's profile."""
     return user

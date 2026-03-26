@@ -1,11 +1,17 @@
-from math import ceil
+"""Repository for Post database operations."""
 
 from sqlalchemy.orm import Session
 
 from app.models import Post
 
+# Fields that may be updated via the API. Prevents mass-assignment of
+# internal columns like ``id``, ``slug``, or ``created_at``.
+UPDATABLE_FIELDS = {"title", "content", "excerpt", "featured_image", "category", "published"}
+
 
 class PostRepository:
+    """Encapsulates all SQL queries related to Post records."""
+
     def __init__(self, db: Session):
         self.db = db
 
@@ -18,6 +24,7 @@ class PostRepository:
     def list_published(
         self, category: str | None = None, page: int = 1, limit: int = 10
     ) -> tuple[list[Post], int]:
+        """Return published posts, optionally filtered by category."""
         q = self.db.query(Post).filter(Post.published == True)
         if category:
             q = q.filter(Post.category == category)
@@ -28,6 +35,7 @@ class PostRepository:
     def list_all(
         self, category: str | None = None, page: int = 1, limit: int = 20
     ) -> tuple[list[Post], int]:
+        """Return all posts (including unpublished) for the admin panel."""
         q = self.db.query(Post)
         if category:
             q = q.filter(Post.category == category)
@@ -46,8 +54,10 @@ class PostRepository:
         return post
 
     def update(self, post: Post, data: dict) -> Post:
+        """Update only whitelisted fields to prevent mass-assignment."""
         for key, value in data.items():
-            setattr(post, key, value)
+            if key in UPDATABLE_FIELDS:
+                setattr(post, key, value)
         self.db.commit()
         self.db.refresh(post)
         return post
@@ -57,6 +67,7 @@ class PostRepository:
         self.db.commit()
 
     def search(self, term: str, limit: int = 10) -> list[Post]:
+        """Full-text-like search on title and content (LIKE query)."""
         pattern = f"%{term}%"
         return (
             self.db.query(Post)

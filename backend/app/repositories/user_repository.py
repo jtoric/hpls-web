@@ -1,9 +1,13 @@
+"""Repository for User database operations."""
+
 from sqlalchemy.orm import Session
 
 from app.models import User
 
 
 class UserRepository:
+    """Encapsulates all SQL queries related to User records."""
+
     def __init__(self, db: Session):
         self.db = db
 

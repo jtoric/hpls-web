@@ -1,9 +1,13 @@
+"""Repository for Document database operations."""
+
 from sqlalchemy.orm import Session
 
 from app.models import Document
 
 
 class DocumentRepository:
+    """Encapsulates all SQL queries related to Document records."""
+
     def __init__(self, db: Session):
         self.db = db
 
@@ -11,6 +15,7 @@ class DocumentRepository:
         return self.db.query(Document).filter(Document.id == doc_id).first()
 
     def list_all(self) -> list[Document]:
+        """Return all documents, newest first."""
         return self.db.query(Document).order_by(Document.uploaded_at.desc()).all()
 
     def create(self, **kwargs) -> Document:

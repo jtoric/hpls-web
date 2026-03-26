@@ -1,3 +1,9 @@
+"""FastAPI application entry point.
+
+Creates the app, configures CORS and static file serving, and registers
+all route modules. Run with: ``uvicorn app.main:app --reload``
+"""
+
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -10,25 +16,29 @@ from app.repositories.post_repository import PostRepository
 from app.routers import auth, documents, pages, posts, upload
 from app.services.search_service import SearchService
 
-# Create tables
+# Create all tables on startup (safe no-op if they already exist).
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="HPLS Powerlifting API", version="1.0.0")
 
-# CORS - allow Vue dev server
+# Allow requests from the Vue dev server during development.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:3000", "http://127.0.0.1:5173"],
+    allow_origins=[
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "http://127.0.0.1:5173",
+    ],
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
 
-# Serve uploaded files
+# Serve uploaded files (images, PDFs, etc.) as static assets.
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")
 
-# Register routers
+# Register route modules.
 app.include_router(auth.router)
 app.include_router(posts.router)
 app.include_router(pages.router)
@@ -37,7 +47,8 @@ app.include_router(upload.router)
 
 
 @app.get("/api/health")
-def health():
+def health() -> dict:
+    """Simple health-check endpoint."""
     return {"status": "ok"}
 
 
@@ -46,5 +57,6 @@ def get_search_service(db: Session = Depends(get_db)) -> SearchService:
 
 
 @app.get("/api/search")
-def search(q: str = "", service: SearchService = Depends(get_search_service)):
+def search(q: str = "", service: SearchService = Depends(get_search_service)) -> dict:
+    """Search across published posts and pages."""
     return service.search(q)

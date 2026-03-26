@@ -1,3 +1,5 @@
+"""Endpoints for managing downloadable documents (PDFs, etc.)."""
+
 from fastapi import APIRouter, Depends, UploadFile, status
 from sqlalchemy.orm import Session
 
@@ -18,6 +20,7 @@ def get_document_service(db: Session = Depends(get_db)) -> DocumentService:
 
 @router.get("", response_model=list[DocumentOut])
 def list_documents(service: DocumentService = Depends(get_document_service)):
+    """List all available documents for download."""
     return service.list_all()
 
 
@@ -28,6 +31,7 @@ async def upload_document(
     service: DocumentService = Depends(get_document_service),
     user: User = Depends(get_current_user),
 ):
+    """Upload a new document (admin only)."""
     return await service.upload(title, file)
 
 
@@ -37,4 +41,5 @@ def delete_document(
     service: DocumentService = Depends(get_document_service),
     user: User = Depends(get_current_user),
 ):
+    """Delete a document and its file from disk (admin only)."""
     service.delete(doc_id)
