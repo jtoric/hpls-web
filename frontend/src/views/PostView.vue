@@ -1,3 +1,10 @@
+<!--
+  PostView.vue — Single post detail page (route: /novosti/:slug or /kalendar/:slug).
+
+  Displays the full post content (rendered HTML via v-html), the featured
+  image, a formatted date, and a list of downloadable attachments.
+  The "back" link adapts based on the post category.
+-->
 <template>
   <div class="max-w-4xl mx-auto px-4 py-12">
     <div v-if="loading" class="text-center py-12 text-gray-500">
@@ -5,7 +12,7 @@
     </div>
 
     <template v-else-if="post">
-      <!-- Back button -->
+      <!-- Context-aware back link (news vs calendar) -->
       <router-link
         :to="backLink"
         class="inline-flex items-center text-blue-700 hover:text-blue-900 font-medium mb-6 transition"
@@ -29,9 +36,10 @@
           class="w-full rounded-lg mb-8 object-cover max-h-96"
         />
 
+        <!-- Post HTML content (sanitised on the backend) -->
         <div class="prose prose-lg max-w-none" v-html="post.content"></div>
 
-        <!-- Attachments -->
+        <!-- Downloadable attachments -->
         <div v-if="post.attachments && post.attachments.length" class="mt-10 border-t pt-6">
           <h3 class="text-xl font-semibold text-gray-800 mb-4">Prilozi</h3>
           <ul class="space-y-2">
@@ -62,35 +70,21 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { getPost } from '@/api/index.js'
+import { formatDate } from '@/utils/formatters'
 
 const route = useRoute()
 
 const post = ref(null)
 const loading = ref(true)
 
+/** Navigate back to the appropriate list view. */
 const backLink = computed(() => {
-  if (post.value && post.value.category === 'calendar') {
-    return '/kalendar'
-  }
-  return '/novosti'
+  return post.value?.category === 'calendar' ? '/kalendar' : '/novosti'
 })
 
 const backLabel = computed(() => {
-  if (post.value && post.value.category === 'calendar') {
-    return 'Natrag na kalendar'
-  }
-  return 'Natrag na novosti'
+  return post.value?.category === 'calendar' ? 'Natrag na kalendar' : 'Natrag na novosti'
 })
-
-function formatDate(dateStr) {
-  if (!dateStr) return ''
-  const date = new Date(dateStr)
-  return date.toLocaleDateString('hr-HR', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  })
-}
 
 onMounted(async () => {
   try {

@@ -1,3 +1,12 @@
+<!--
+  PagesList.vue — Admin page list (route: /admin/pages).
+
+  Displays all static pages grouped into:
+  1. Top-level pages (no parent_slug) — Rekordi, Poredak, Kontakt
+  2. "O nama" sub-pages (parent_slug === "o-nama")
+
+  Each page has an "Uredi" link that navigates to the PageEditor.
+-->
 <template>
   <div class="max-w-4xl mx-auto px-4 py-12">
     <div class="flex items-center justify-between mb-8">
@@ -33,7 +42,7 @@
         </div>
       </div>
 
-      <!-- O nama sub-pages -->
+      <!-- "O nama" sub-pages -->
       <div>
         <h2 class="text-lg font-semibold text-gray-700 mb-4">O nama - podstranice</h2>
         <div class="space-y-2">
@@ -66,7 +75,10 @@ import { getPages } from '@/api/index.js'
 const pages = ref([])
 const loading = ref(true)
 
+/** Pages without a parent — shown in the "Glavne stranice" section. */
 const topPages = computed(() => pages.value.filter(p => !p.parent_slug))
+
+/** Pages under the "O nama" section (parent_slug === "o-nama"). */
 const subPages = computed(() => pages.value.filter(p => p.parent_slug === 'o-nama'))
 
 onMounted(async () => {

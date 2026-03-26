@@ -1,3 +1,9 @@
+<!--
+  HomeView.vue — Landing page (route: /).
+
+  Shows a hero banner and a grid of the 6 most recent published news posts.
+  Includes a "Sve novosti" button linking to the full news list.
+-->
 <template>
   <div>
     <!-- Hero section -->
@@ -10,7 +16,7 @@
       </div>
     </section>
 
-    <!-- Latest news -->
+    <!-- Latest news grid -->
     <section class="max-w-6xl mx-auto px-4 py-16">
       <h2 class="text-3xl font-bold text-gray-800 mb-8">Najnovije novosti</h2>
 

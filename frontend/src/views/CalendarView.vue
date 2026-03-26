@@ -1,3 +1,9 @@
+<!--
+  CalendarView.vue — Paginated list of competition calendar posts (route: /kalendar).
+
+  Identical to NewsListView but fetches posts with category "calendar".
+  The page number is tracked in the URL query string (?page=N).
+-->
 <template>
   <div class="max-w-6xl mx-auto px-4 py-12">
     <h1 class="text-3xl font-bold text-gray-800 mb-8">Kalendar natjecanja</h1>
@@ -15,7 +21,7 @@
         Nema nadolazećih natjecanja.
       </div>
 
-      <!-- Pagination -->
+      <!-- Pagination controls -->
       <div v-if="totalPages > 1" class="flex justify-center items-center gap-4 mt-12">
         <button
           :disabled="currentPage <= 1"
@@ -55,6 +61,7 @@ const loading = ref(true)
 const currentPage = ref(1)
 const totalPages = ref(1)
 
+/** Fetch a single page of calendar posts from the API. */
 async function fetchPosts(page = 1) {
   loading.value = true
   try {
@@ -69,10 +76,12 @@ async function fetchPosts(page = 1) {
   }
 }
 
+/** Navigate to a page by updating the query string. */
 function goToPage(page) {
   router.push({ query: { ...route.query, page } })
 }
 
+// Re-fetch when the ?page query param changes.
 watch(
   () => route.query.page,
   (page) => {

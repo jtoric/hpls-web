@@ -1,10 +1,18 @@
+<!--
+  PostCard.vue — Card component for displaying a post preview.
+
+  Used on the homepage grid, news list, and calendar list.
+  Shows the featured image (or a placeholder), a Croatian-formatted
+  date, the title, and an optional excerpt. The entire card is a
+  link to the full post view.
+-->
 <template>
   <router-link
     :to="postUrl"
     class="group block bg-white rounded-lg shadow hover:shadow-lg transition-shadow duration-200 overflow-hidden"
   >
     <div class="flex flex-col sm:flex-row">
-      <!-- Image -->
+      <!-- Featured image or placeholder -->
       <div class="sm:w-1/3 flex-shrink-0">
         <div class="aspect-video sm:aspect-auto sm:h-full bg-gray-100 overflow-hidden">
           <img
@@ -24,7 +32,7 @@
         </div>
       </div>
 
-      <!-- Content -->
+      <!-- Text content -->
       <div class="p-4 sm:p-5 flex flex-col justify-center flex-1">
         <time class="text-xs text-gray-400 mb-1 block">{{ formattedDate }}</time>
         <h3 class="text-lg font-semibold text-gray-900 group-hover:text-[#2471a3] transition-colors mb-2 line-clamp-2">
@@ -40,30 +48,22 @@
 
 <script setup>
 import { computed } from 'vue'
+import { formatDateCroatian } from '@/utils/formatters'
 
 const props = defineProps({
+  /** Post object from the API (must include title, slug, category, created_at). */
   post: {
     type: Object,
     required: true,
   },
 })
 
-const croatianMonths = [
-  'siječnja', 'veljače', 'ožujka', 'travnja', 'svibnja', 'lipnja',
-  'srpnja', 'kolovoza', 'rujna', 'listopada', 'studenoga', 'prosinca',
-]
+/** Date formatted with Croatian genitive month names (e.g. "15. ožujka 2025."). */
+const formattedDate = computed(() => formatDateCroatian(props.post.created_at))
 
-const formattedDate = computed(() => {
-  if (!props.post.created_at) return ''
-  const date = new Date(props.post.created_at)
-  const day = date.getDate()
-  const month = croatianMonths[date.getMonth()]
-  const year = date.getFullYear()
-  return `${day}. ${month} ${year}.`
-})
-
+/** Build the correct URL based on post category (news vs calendar). */
 const postUrl = computed(() => {
-  const base = props.post.category === 'kalendar' ? '/kalendar' : '/novosti'
+  const base = props.post.category === 'calendar' ? '/kalendar' : '/novosti'
   return `${base}/${props.post.slug}`
 })
 </script>

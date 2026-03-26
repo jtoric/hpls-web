@@ -1,3 +1,10 @@
+<!--
+  LoginView.vue — Admin login form (route: /prijava).
+
+  Authenticates via the Pinia auth store, then redirects
+  to the admin dashboard on success. Distinguishes between
+  401 (wrong credentials) and other server errors.
+-->
 <template>
   <div class="min-h-[70vh] flex items-center justify-center px-4">
     <div class="w-full max-w-md bg-white border border-gray-200 rounded-xl shadow-sm p-8">
@@ -32,6 +39,7 @@
           />
         </div>
 
+        <!-- Inline error message -->
         <div v-if="error" class="bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 text-sm">
           {{ error }}
         </div>
@@ -61,6 +69,7 @@ const password = ref('')
 const error = ref('')
 const submitting = ref(false)
 
+/** Submit credentials and redirect to /admin on success. */
 async function handleLogin() {
   error.value = ''
   submitting.value = true

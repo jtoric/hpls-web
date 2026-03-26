@@ -1,3 +1,10 @@
+<!--
+  PageEditor.vue — Edit a static page (route: /admin/pages/:id/edit?slug=...).
+
+  Similar to PostEditor but simpler — pages only have title + content.
+  Supports image and file uploads inserted into the TipTap editor.
+  Uploaded files are tracked in a sidebar list for reference.
+-->
 <template>
   <div class="max-w-4xl mx-auto px-4 py-12">
     <div class="flex items-center justify-between mb-8">
@@ -20,10 +27,11 @@
         />
       </div>
 
-      <!-- Content editor -->
+      <!-- TipTap content editor -->
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">Sadržaj</label>
         <div class="border border-gray-300 rounded-lg overflow-hidden">
+          <!-- Editor toolbar -->
           <div class="flex flex-wrap gap-1 p-2 bg-gray-50 border-b border-gray-200">
             <button type="button" @click="editor?.chain().focus().toggleBold().run()"
               :class="{'bg-gray-300': editor?.isActive('bold')}"
@@ -53,7 +61,7 @@
         </div>
       </div>
 
-      <!-- Uploaded files info -->
+      <!-- List of files uploaded during this editing session -->
       <div v-if="uploadedFiles.length" class="bg-gray-50 rounded-lg p-4">
         <h3 class="text-sm font-medium text-gray-700 mb-2">Uploadane datoteke</h3>
         <ul class="space-y-1">
@@ -63,6 +71,7 @@
         </ul>
       </div>
 
+      <!-- Submit -->
       <div class="flex items-center gap-4 pt-4">
         <button
           type="submit"
@@ -73,6 +82,7 @@
         </button>
       </div>
 
+      <!-- Status messages -->
       <div v-if="message" class="text-green-600 font-medium">{{ message }}</div>
       <div v-if="error" class="text-red-600 font-medium">{{ error }}</div>
     </form>
@@ -100,8 +110,11 @@ const message = ref('')
 const error = ref('')
 const imageInput = ref(null)
 const fileInput = ref(null)
+
+/** Track files uploaded during this session for reference. */
 const uploadedFiles = ref([])
 
+// Initialise TipTap editor.
 const editor = useEditor({
   extensions: [
     StarterKit,
@@ -114,6 +127,7 @@ const editor = useEditor({
   },
 })
 
+// Load existing page content.
 onMounted(async () => {
   try {
     const response = await getPage(slug)
@@ -128,6 +142,7 @@ onMounted(async () => {
   }
 })
 
+// Clean up the editor on unmount.
 onBeforeUnmount(() => {
   editor.value?.destroy()
 })
@@ -135,6 +150,7 @@ onBeforeUnmount(() => {
 function triggerImage() { imageInput.value?.click() }
 function triggerFile() { fileInput.value?.click() }
 
+/** Upload an image and insert it into the editor. */
 async function handleImage(event) {
   const file = event.target.files[0]
   if (!file) return
@@ -149,6 +165,7 @@ async function handleImage(event) {
   }
 }
 
+/** Upload a generic file and insert a download link into the editor. */
 async function handleFile(event) {
   const file = event.target.files[0]
   if (!file) return
@@ -157,7 +174,6 @@ async function handleFile(event) {
     fd.append('file', file)
     const response = await uploadFile(fd)
     const data = response.data
-    // Insert link to file in editor
     editor.value?.chain().focus().setLink({ href: data.file_path }).insertContent(data.original_name).run()
     uploadedFiles.value.push(data)
   } catch (err) {
@@ -165,6 +181,7 @@ async function handleFile(event) {
   }
 }
 
+/** Prompt for a URL and apply it as a link on the selection. */
 function addLink() {
   const url = prompt('Unesite URL:')
   if (url) {
@@ -172,6 +189,7 @@ function addLink() {
   }
 }
 
+/** Save changes to the page. */
 async function handleSubmit() {
   saving.value = true
   message.value = ''

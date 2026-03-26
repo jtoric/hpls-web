@@ -1,3 +1,9 @@
+<!--
+  DocumentsView.vue — Public download page for documents (route: /dokumenti).
+
+  Lists all uploaded documents with their title, file size, upload date,
+  and a download button. Uses shared formatters for consistent display.
+-->
 <template>
   <div class="max-w-4xl mx-auto px-4 py-12">
     <h1 class="text-3xl font-bold text-gray-800 mb-8">Dokumenti</h1>
@@ -45,31 +51,10 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { getDocuments } from '@/api/index.js'
+import { formatDate, formatFileSize } from '@/utils/formatters'
 
 const documents = ref([])
 const loading = ref(true)
-
-function formatFileSize(bytes) {
-  if (!bytes) return ''
-  const units = ['B', 'KB', 'MB', 'GB']
-  let size = bytes
-  let unitIndex = 0
-  while (size >= 1024 && unitIndex < units.length - 1) {
-    size /= 1024
-    unitIndex++
-  }
-  return `${size.toFixed(unitIndex === 0 ? 0 : 1)} ${units[unitIndex]}`
-}
-
-function formatDate(dateStr) {
-  if (!dateStr) return ''
-  const date = new Date(dateStr)
-  return date.toLocaleDateString('hr-HR', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  })
-}
 
 onMounted(async () => {
   try {

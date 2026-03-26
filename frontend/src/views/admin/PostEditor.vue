@@ -1,3 +1,17 @@
+<!--
+  PostEditor.vue — Create / edit a post (news or calendar).
+
+  Routes:
+  - /admin/posts/new?category=news|calendar  → create mode
+  - /admin/posts/:id/edit                    → edit mode
+
+  Features:
+  - TipTap WYSIWYG editor with bold, italic, headings, lists, links, images
+  - Featured image upload
+  - Inline image upload into the editor content
+  - Category selector and published toggle
+  - Delete post (edit mode only)
+-->
 <template>
   <div class="max-w-4xl mx-auto px-4 py-12">
     <div class="flex items-center justify-between mb-8">
@@ -22,7 +36,7 @@
         />
       </div>
 
-      <!-- Category -->
+      <!-- Category selector -->
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">Kategorija</label>
         <select
@@ -45,7 +59,7 @@
         ></textarea>
       </div>
 
-      <!-- Featured image -->
+      <!-- Featured image upload -->
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">Naslovna slika</label>
         <div class="flex items-center gap-4">
@@ -64,11 +78,11 @@
         />
       </div>
 
-      <!-- Content editor -->
+      <!-- TipTap content editor -->
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">Sadržaj</label>
         <div class="border border-gray-300 rounded-lg overflow-hidden">
-          <!-- Toolbar -->
+          <!-- Editor toolbar -->
           <div class="flex flex-wrap gap-1 p-2 bg-gray-50 border-b border-gray-200">
             <button type="button" @click="editor?.chain().focus().toggleBold().run()"
               :class="{'bg-gray-300': editor?.isActive('bold')}"
@@ -98,13 +112,13 @@
         </div>
       </div>
 
-      <!-- Published -->
+      <!-- Published toggle -->
       <div class="flex items-center gap-2">
         <input id="published" v-model="form.published" type="checkbox" class="w-4 h-4" />
         <label for="published" class="text-sm font-medium text-gray-700">Objavljeno</label>
       </div>
 
-      <!-- Actions -->
+      <!-- Submit / Delete actions -->
       <div class="flex items-center gap-4 pt-4">
         <button
           type="submit"
@@ -124,6 +138,7 @@
         </button>
       </div>
 
+      <!-- Status messages -->
       <div v-if="message" class="text-green-600 font-medium">{{ message }}</div>
       <div v-if="error" class="text-red-600 font-medium">{{ error }}</div>
     </form>
@@ -142,6 +157,7 @@ import { getPost, createPost, updatePost, deletePost, uploadFile, getAdminPosts 
 const route = useRoute()
 const router = useRouter()
 
+/** True when editing an existing post (route has :id param). */
 const isEditing = computed(() => !!route.params.id)
 const postId = computed(() => route.params.id ? Number(route.params.id) : null)
 
@@ -161,6 +177,7 @@ const error = ref('')
 const editorImageInput = ref(null)
 const postSlug = ref('')
 
+// Initialise the TipTap WYSIWYG editor with extensions for images and links.
 const editor = useEditor({
   extensions: [
     StarterKit,
@@ -173,15 +190,15 @@ const editor = useEditor({
   },
 })
 
+// In edit mode, load the existing post data into the form.
 onMounted(async () => {
   if (isEditing.value) {
     try {
-      // Fetch the post by finding it in admin list
+      // Find the post slug by ID from the admin list, then fetch full content.
       const response = await getAdminPosts({ limit: 100 })
       const post = response.data.items.find(p => p.id === postId.value)
       if (post) {
         postSlug.value = post.slug
-        // Now fetch full post with content
         const fullPost = await getPost(post.slug)
         const data = fullPost.data
         form.title = data.title
@@ -198,10 +215,12 @@ onMounted(async () => {
   }
 })
 
+// Destroy the TipTap editor instance to free resources.
 onBeforeUnmount(() => {
   editor.value?.destroy()
 })
 
+/** Upload and set the featured (hero) image. */
 async function handleFeaturedImage(event) {
   const file = event.target.files[0]
   if (!file) return
@@ -218,10 +237,12 @@ async function handleFeaturedImage(event) {
   }
 }
 
+/** Open the hidden file input for inserting an image into the editor. */
 function triggerEditorImage() {
   editorImageInput.value?.click()
 }
 
+/** Upload an image and insert it inline into the TipTap editor. */
 async function handleEditorImage(event) {
   const file = event.target.files[0]
   if (!file) return
@@ -235,6 +256,7 @@ async function handleEditorImage(event) {
   }
 }
 
+/** Prompt for a URL and wrap the current selection as a link. */
 function addLink() {
   const url = prompt('Unesite URL:')
   if (url) {
@@ -242,6 +264,7 @@ function addLink() {
   }
 }
 
+/** Create a new post or update an existing one. */
 async function handleSubmit() {
   saving.value = true
   message.value = ''
@@ -253,6 +276,7 @@ async function handleSubmit() {
     } else {
       const response = await createPost({ ...form })
       message.value = 'Objava uspješno kreirana!'
+      // Switch to edit mode so subsequent saves update rather than create.
       router.replace(`/admin/posts/${response.data.id}/edit`)
     }
   } catch (err) {
@@ -262,6 +286,7 @@ async function handleSubmit() {
   }
 }
 
+/** Delete the post after user confirmation. */
 async function handleDelete() {
   if (!confirm('Jeste li sigurni da želite obrisati ovu objavu?')) return
   try {

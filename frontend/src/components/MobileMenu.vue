@@ -1,5 +1,15 @@
+<!--
+  MobileMenu.vue — Slide-in navigation drawer for mobile.
+
+  Uses Vue's Teleport to render the overlay at the document body level
+  so it sits above all other content. The menu supports:
+  - v-model for open/close state (controlled by the parent AppHeader)
+  - Expandable "O nama" sub-section with animated reveal
+  - Close on backdrop click or close-button tap
+-->
 <template>
   <Teleport to="body">
+    <!-- Backdrop fade -->
     <Transition
       enter-active-class="transition duration-300 ease-out"
       enter-from-class="opacity-0"
@@ -13,6 +23,7 @@
         class="fixed inset-0 z-[100] bg-black/60"
         @click.self="close"
       >
+        <!-- Slide-in panel -->
         <Transition
           enter-active-class="transition duration-300 ease-out"
           enter-from-class="-translate-x-full"
@@ -25,7 +36,7 @@
             v-if="modelValue"
             class="absolute inset-y-0 left-0 w-72 max-w-[85vw] bg-[#1a1a2e] shadow-2xl flex flex-col overflow-y-auto"
           >
-            <!-- Header -->
+            <!-- Header with Admin/Login link and close button -->
             <div class="flex items-center justify-between px-4 h-16 border-b border-white/10">
               <router-link
                 v-if="authStore.isAuthenticated"
@@ -55,7 +66,7 @@
               </button>
             </div>
 
-            <!-- Nav items -->
+            <!-- Navigation links -->
             <nav class="flex-1 py-4">
               <router-link to="/" class="mobile-link" @click="close">Naslovnica</router-link>
               <router-link to="/novosti" class="mobile-link" @click="close">Novosti</router-link>
@@ -63,7 +74,7 @@
               <router-link to="/poredak" class="mobile-link" @click="close">Poredak</router-link>
               <router-link to="/kalendar" class="mobile-link" @click="close">Kalendar</router-link>
 
-              <!-- O nama expandable -->
+              <!-- "O nama" expandable section -->
               <div>
                 <button
                   class="mobile-link w-full flex items-center justify-between"
@@ -114,6 +125,7 @@ import { ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 
 const props = defineProps({
+  /** Whether the mobile menu is currently open. */
   modelValue: {
     type: Boolean,
     required: true,
@@ -122,8 +134,11 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue'])
 const authStore = useAuthStore()
+
+/** Controls the expanded/collapsed state of the "O nama" sub-section. */
 const oNamaExpanded = ref(false)
 
+/** Close the menu by emitting false to the parent v-model. */
 function close() {
   emit('update:modelValue', false)
 }

@@ -1,3 +1,10 @@
+<!--
+  AdminDashboard.vue — Admin home page (route: /admin).
+
+  Provides quick-action cards for the main admin tasks:
+  creating news posts, calendar entries, editing static pages,
+  and managing uploaded documents. Also includes a logout button.
+-->
 <template>
   <div class="max-w-4xl mx-auto px-4 py-12">
     <div class="flex items-center justify-between mb-10">
@@ -10,7 +17,9 @@
       </button>
     </div>
 
+    <!-- Quick-action card grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- New news post -->
       <router-link
         to="/admin/posts/new?category=news"
         class="block bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg hover:border-blue-300 transition group"
@@ -24,6 +33,7 @@
         <p class="text-sm text-gray-500">Objavi novu vijest na stranicu</p>
       </router-link>
 
+      <!-- New calendar entry -->
       <router-link
         to="/admin/posts/new?category=calendar"
         class="block bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg hover:border-green-300 transition group"
@@ -37,6 +47,7 @@
         <p class="text-sm text-gray-500">Dodaj natjecanje u kalendar</p>
       </router-link>
 
+      <!-- Edit static pages -->
       <router-link
         to="/admin/pages"
         class="block bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg hover:border-purple-300 transition group"
@@ -50,6 +61,7 @@
         <p class="text-sm text-gray-500">Rekordi, Poredak, O nama, Kontakt</p>
       </router-link>
 
+      <!-- Manage documents -->
       <router-link
         to="/admin/documents"
         class="block bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg hover:border-orange-300 transition group"
@@ -73,6 +85,7 @@ import { useAuthStore } from '@/stores/auth'
 const router = useRouter()
 const authStore = useAuthStore()
 
+/** Log out and redirect to the public homepage. */
 function handleLogout() {
   authStore.logout()
   router.push('/')

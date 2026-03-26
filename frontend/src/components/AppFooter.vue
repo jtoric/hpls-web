@@ -1,3 +1,9 @@
+<!--
+  AppFooter.vue — Site footer with organisation info.
+
+  Displays the HPLS name, address, OIB, IBAN, email,
+  social media links, and a copyright notice.
+-->
 <template>
   <footer class="bg-[#2471a3] text-white py-10 px-4">
     <div class="max-w-4xl mx-auto text-center">
@@ -6,6 +12,7 @@
       </div>
       <h3 class="font-bold text-xl mb-6">HRVATSKI POWERLIFTING SAVEZ</h3>
 
+      <!-- Contact details -->
       <div class="space-y-2 text-white/90 mb-6">
         <p><strong>Adresa:</strong> Matije Gupca 63, 33000 Virovitica</p>
         <p><strong>OIB:</strong> 38157020492</p>
@@ -18,6 +25,7 @@
         </p>
       </div>
 
+      <!-- Social links -->
       <div class="flex items-center justify-center gap-6 mb-8">
         <a href="https://facebook.com" target="_blank" rel="noopener" class="flex items-center gap-2 text-white/80 hover:text-white transition-colors">
           <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
@@ -29,6 +37,7 @@
         </a>
       </div>
 
+      <!-- Copyright -->
       <div class="pt-4 border-t border-white/20 text-sm text-white/60">
         Sva prava pridržana &copy; Hrvatski powerlifting savez, {{ new Date().getFullYear() }}.
       </div>
@@ -37,4 +46,5 @@
 </template>
 
 <script setup>
+// No script logic — purely presentational component.
 </script>

@@ -1,3 +1,13 @@
+<!--
+  AppHeader.vue — Main sticky navigation bar.
+
+  Contains:
+  - Hamburger button for the mobile slide-in menu
+  - HPLS logo linking to the homepage
+  - Desktop navigation with "O nama" hover dropdown
+  - Search icon that opens the SearchModal
+  - Conditional "Admin" link when authenticated
+-->
 <template>
   <header class="sticky top-0 z-50 bg-[#1a1a2e] shadow-lg">
     <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
@@ -31,7 +41,7 @@
         <router-link to="/poredak" class="nav-link">Poredak</router-link>
         <router-link to="/kalendar" class="nav-link">Kalendar</router-link>
 
-        <!-- O nama dropdown -->
+        <!-- "O nama" dropdown — opens on hover, closes on mouse leave -->
         <div class="relative" @mouseenter="oNamaOpen = true" @mouseleave="oNamaOpen = false">
           <button class="nav-link inline-flex items-center gap-1">
             O nama
@@ -78,10 +88,10 @@
       </button>
     </div>
 
-    <!-- Mobile menu -->
+    <!-- Mobile slide-in menu (Teleported to body) -->
     <MobileMenu v-model="mobileMenuOpen" />
 
-    <!-- Search modal -->
+    <!-- Search overlay modal (Teleported to body) -->
     <SearchModal v-model="searchOpen" />
   </header>
 </template>

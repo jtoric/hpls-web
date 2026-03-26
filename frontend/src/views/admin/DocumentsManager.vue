@@ -1,3 +1,11 @@
+<!--
+  DocumentsManager.vue — Admin document management (route: /admin/documents).
+
+  Provides:
+  - An upload form for adding new documents (title + file)
+  - A list of existing documents with download and delete actions
+  - Uses shared formatters for file size and date display
+-->
 <template>
   <div class="max-w-4xl mx-auto px-4 py-12">
     <div class="flex items-center justify-between mb-8">
@@ -80,6 +88,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { getDocuments, uploadDocument, deleteDocument } from '@/api/index.js'
+import { formatDate, formatFileSize } from '@/utils/formatters'
 
 const documents = ref([])
 const loading = ref(true)
@@ -89,22 +98,7 @@ const uploadMessage = ref('')
 const newTitle = ref('')
 const fileInput = ref(null)
 
-function formatFileSize(bytes) {
-  if (!bytes) return ''
-  const units = ['B', 'KB', 'MB', 'GB']
-  let size = bytes
-  let i = 0
-  while (size >= 1024 && i < units.length - 1) { size /= 1024; i++ }
-  return `${size.toFixed(i === 0 ? 0 : 1)} ${units[i]}`
-}
-
-function formatDate(dateStr) {
-  if (!dateStr) return ''
-  return new Date(dateStr).toLocaleDateString('hr-HR', {
-    day: 'numeric', month: 'long', year: 'numeric',
-  })
-}
-
+/** Fetch the full list of documents. */
 async function fetchDocuments() {
   loading.value = true
   try {
@@ -117,6 +111,7 @@ async function fetchDocuments() {
   }
 }
 
+/** Upload a new document and refresh the list on success. */
 async function handleUpload() {
   const file = fileInput.value?.files[0]
   if (!file || !newTitle.value) return
@@ -141,6 +136,7 @@ async function handleUpload() {
   }
 }
 
+/** Delete a document after user confirmation and refresh the list. */
 async function handleDelete(doc) {
   if (!confirm(`Obrisati dokument "${doc.title}"?`)) return
   try {

@@ -1,11 +1,22 @@
+/*
+ * Global stylesheet — TailwindCSS v4 entry point.
+ *
+ * Imports Tailwind's base, components, and utilities layers.
+ * Custom styles below handle:
+ * - Base body defaults
+ * - Prose (rendered HTML content) formatting for images and links
+ * - TipTap WYSIWYG editor appearance
+ */
 @import "tailwindcss";
 
+/* ── Base layer overrides ────────────────────────────────────────────────── */
 @layer base {
   body {
     @apply bg-white text-gray-800 font-sans;
   }
 }
 
+/* ── Prose styles (v-html rendered content in PostView & PageView) ──────── */
 .prose img {
   max-width: 100%;
   height: auto;
@@ -17,6 +28,7 @@
   text-decoration: underline;
 }
 
+/* ── TipTap editor styles (used in PostEditor & PageEditor) ─────────────── */
 .tiptap {
   outline: none;
   min-height: 300px;
