@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd backend && python -m pytest*)",
+      "Bash(cd frontend && npm run build*)",
+      "Bash(cd frontend && npm run dev*)",
+      "Bash(cd backend && uvicorn*)",
+      "Bash(pip install*)",
+      "Bash(npm install*)",
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git add*)",
+      "Bash(git commit*)",
+      "Bash(git push*)",
+      "Bash(git fetch*)",
+      "Bash(git pull*)",
+      "Bash(git branch*)",
+      "Bash(git checkout*)",
+      "Bash(ls*)"
+    ]
+  }
+}
