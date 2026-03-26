@@ -1,21 +1,23 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from app.auth import create_access_token, get_current_user, verify_password
+from app.auth import get_current_user
 from app.database import get_db
 from app.models import User
+from app.repositories.user_repository import UserRepository
 from app.schemas import LoginRequest, Token, UserOut
+from app.services.auth_service import AuthService
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
 
+def get_auth_service(db: Session = Depends(get_db)) -> AuthService:
+    return AuthService(UserRepository(db))
+
+
 @router.post("/login", response_model=Token)
-def login(data: LoginRequest, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.username == data.username).first()
-    if not user or not verify_password(data.password, user.password_hash):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
-    token = create_access_token({"sub": user.username})
-    return Token(access_token=token)
+def login(data: LoginRequest, service: AuthService = Depends(get_auth_service)):
+    return service.login(data.username, data.password)
 
 
 @router.get("/me", response_model=UserOut)

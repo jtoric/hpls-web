@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 # --- Auth ---
@@ -15,11 +15,10 @@ class Token(BaseModel):
 
 
 class UserOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     username: str
-
-    class Config:
-        from_attributes = True
 
 
 # --- Post ---
@@ -42,17 +41,18 @@ class PostUpdate(BaseModel):
 
 
 class AttachmentOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     file_path: str
     file_type: str
     original_name: str
     uploaded_at: datetime
 
-    class Config:
-        from_attributes = True
-
 
 class PostOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     title: str
     slug: str
@@ -65,11 +65,10 @@ class PostOut(BaseModel):
     updated_at: datetime
     attachments: list[AttachmentOut] = []
 
-    class Config:
-        from_attributes = True
-
 
 class PostListOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     title: str
     slug: str
@@ -78,9 +77,6 @@ class PostListOut(BaseModel):
     category: str
     published: bool
     created_at: datetime
-
-    class Config:
-        from_attributes = True
 
 
 # --- Page ---
@@ -98,6 +94,8 @@ class PageCreate(BaseModel):
 
 
 class PageOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     title: str
     slug: str
@@ -107,11 +105,10 @@ class PageOut(BaseModel):
     updated_at: datetime
     attachments: list[AttachmentOut] = []
 
-    class Config:
-        from_attributes = True
-
 
 class PageListOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     title: str
     slug: str
@@ -119,20 +116,16 @@ class PageListOut(BaseModel):
     sort_order: int
     updated_at: datetime
 
-    class Config:
-        from_attributes = True
-
 
 # --- Document ---
 class DocumentOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     title: str
     file_path: str
     file_size: int
     uploaded_at: datetime
-
-    class Config:
-        from_attributes = True
 
 
 # --- Generic ---

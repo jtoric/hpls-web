@@ -1,10 +1,14 @@
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from sqlalchemy.orm import Session
 
 from app.config import UPLOAD_DIR
-from app.database import Base, engine
+from app.database import Base, engine, get_db
+from app.repositories.page_repository import PageRepository
+from app.repositories.post_repository import PostRepository
 from app.routers import auth, documents, pages, posts, upload
+from app.services.search_service import SearchService
 
 # Create tables
 Base.metadata.create_all(bind=engine)
@@ -37,35 +41,10 @@ def health():
     return {"status": "ok"}
 
 
+def get_search_service(db: Session = Depends(get_db)) -> SearchService:
+    return SearchService(PostRepository(db), PageRepository(db))
+
+
 @app.get("/api/search")
-def search(q: str = ""):
-    """Simple search across posts and pages."""
-    if len(q) < 2:
-        return {"posts": [], "pages": []}
-
-    from sqlalchemy.orm import Session
-    from app.database import SessionLocal
-    from app.models import Post, Page
-
-    db = SessionLocal()
-    try:
-        term = f"%{q}%"
-        found_posts = (
-            db.query(Post)
-            .filter(Post.published == True, (Post.title.ilike(term) | Post.content.ilike(term)))
-            .order_by(Post.created_at.desc())
-            .limit(10)
-            .all()
-        )
-        found_pages = (
-            db.query(Page)
-            .filter(Page.title.ilike(term) | Page.content.ilike(term))
-            .limit(10)
-            .all()
-        )
-        return {
-            "posts": [{"id": p.id, "title": p.title, "slug": p.slug, "category": p.category} for p in found_posts],
-            "pages": [{"id": p.id, "title": p.title, "slug": p.slug} for p in found_pages],
-        }
-    finally:
-        db.close()
+def search(q: str = "", service: SearchService = Depends(get_search_service)):
+    return service.search(q)
